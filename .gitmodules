@@ -1,6 +1,0 @@
-[submodule "solar-frontend"]
-	path = solar-frontend
-	url = https://github.com/seheru/solar-frontend.git
-[submodule "SolarBackend"]
-	path = SolarBackend
-	url = https://github.com/seheru/SolarBackend.git
