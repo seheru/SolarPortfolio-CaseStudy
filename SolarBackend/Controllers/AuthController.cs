@@ -72,30 +72,30 @@ public class AuthController : ControllerBase
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (user == null) return NotFound("Kullanıcı bulunamadı.");
 
-        // Rastgele 20 karakterli ortak bir "Gizli Sır (Secret)" üretiyoruz.
-        var secretKey = KeyGeneration.GenerateRandomKey(20);
-        var base32Secret = Base32Encoding.ToString(secretKey);
+        // KRİTİK DÜZELTME: Eğer kullanıcının zaten bir anahtarı varsa, 
+        // her seferinde yenisini üretip kafa karıştırma! Eskisini kullan.
+        if (string.IsNullOrEmpty(user.MfaSecretKey)) 
+        {
+            var secretKey = KeyGeneration.GenerateRandomKey(20);
+            user.MfaSecretKey = Base32Encoding.ToString(secretKey);
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"YENİ ANAHTAR ÜRETİLDİ: {user.MfaSecretKey}");
+        }
+        else 
+        {
+            Console.WriteLine($"ESKİ ANAHTAR KULLANILIYOR: {user.MfaSecretKey}");
+        }
 
-        // Bu sırrı veritabanına kaydediyoruz ki yarın adam giriş yaparken kodları karşılaştırabilelim.
-        user.MfaSecretKey = base32Secret;
-        await _context.SaveChangesAsync();
-
-        // Sırrımızı karekoda çevirmek için Authenticator uygulamasının anlayacağı özel bir Link (URI) yapıyoruz.
-        var otpAuthUri = new OtpUri(OtpType.Totp, base32Secret, user.Email, "SolarPortfolio").ToString();
-
-        // Linki siyah-beyaz Karekod Resmine (QR) çeviriyoruz.
+        // QR kod üretme kısmı aynı kalıyor...
+        var otpAuthUri = new OtpUri(OtpType.Totp, user.MfaSecretKey, user.Email, "SolarPortfolio").ToString();
         using var qrGenerator = new QRCodeGenerator();
         using var qrCodeData = qrGenerator.CreateQrCode(otpAuthUri, QRCodeGenerator.ECCLevel.Q);
         using var qrCode = new PngByteQRCode(qrCodeData);
         var qrCodeImage = qrCode.GetGraphic(20);
-        
-        // Resmi API üzerinden (JSON olarak) gönderebilmek için Base64 (Metin) formatına dönüştürüyoruz.
         var base64QrCode = Convert.ToBase64String(qrCodeImage);
 
         return Ok(new { 
-            Message = "QR Kod başarıyla üretildi.",
-            QrCodeImage = $"data:image/png;base64,{base64QrCode}",
-            ManualEntryKey = base32Secret 
+            QrCodeImage = $"data:image/png;base64,{base64QrCode}"
         });
     }
 
@@ -105,6 +105,12 @@ public class AuthController : ControllerBase
     [HttpPost("mfa-verify-setup")]
     public async Task<IActionResult> VerifyMfaSetup([FromBody] VerifyRequest request)
     {
+        // DEDEKTİFLİK SATIRLARI (Terminalde bunları göreceğiz)
+        Console.WriteLine("--- MFA DOĞRULAMA İSTEĞİ GELDİ ---");
+        Console.WriteLine($"Gelen Mail: '{request.Email}'");
+        Console.WriteLine($"Gelen Kod: '{request.Code}'");
+
+
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (user == null || string.IsNullOrEmpty(user.MfaSecretKey))
             return BadRequest("Kullanıcı bulunamadı.");
