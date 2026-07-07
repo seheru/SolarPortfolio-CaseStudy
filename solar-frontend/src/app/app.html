@@ -1,29 +1,54 @@
 <div class="min-h-screen flex items-center justify-center p-4 bg-[#110f17] font-sans text-white">
 
   <!-- ============================================================== -->
-  <!-- AŞAMA 1: GİRİŞ EKRANI (E-Posta & Şifre) -->
-  <!-- Önemli: Senin milimetrik olarak ayarladığın tasarımdır. -->
+  <!-- AŞAMA 0: KAYIT OLMA EKRANI -->
+  <!-- Kullanıcı loginStep = 0 olduğunda burayı görür. -->
   <!-- ============================================================== -->
-  <div *ngIf="loginStep === 1" class="flex flex-col md:flex-row w-full max-w-[1033px] h-[563px] bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative">
-    
-    <!-- SOL TARAF: 3D Logo ve Kıvrımlı Arka Plan -->
-    <div class="hidden md:flex w-[310px] h-full relative items-center justify-center bg-no-repeat bg-cover bg-left" 
-         style="background-image: url('Subtract.png');">
+  <div *ngIf="loginStep === 0" class="flex flex-col md:flex-row w-full max-w-[1033px] h-[563px] bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative">
+    <!-- SOL TARAF (3D Logo) -->
+    <div class="hidden md:flex w-[310px] h-full relative items-center justify-center bg-no-repeat bg-cover bg-left" style="background-image: url('Subtract.png');">
       <img src="Intersect.png" alt="3D Logo" class="w-[282px] object-contain drop-shadow-2xl z-10 relative top-[17px]">
     </div>
+    <!-- SAĞ TARAF: Kayıt Formu -->
+    <div class="flex-1 flex flex-col justify-center px-12 md:px-24 lg:px-40 relative">
+      <h2 class="text-2xl font-bold text-white mb-1.5 tracking-wide">Hesap Oluştur</h2>
+      <p class="text-[#9ca3af] text-xs mb-8">Solar Portfolio dünyasına katılmak için kayıt olun</p>
 
-    <!-- SAĞ TARAF: Form Giriş Alanı -->
+      <div class="space-y-4">
+        <input type="email" placeholder="E-posta adresiniz" [(ngModel)]="userEmail" class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#AA9DD6]">
+        <input type="password" placeholder="Güçlü bir şifre belirleyin" [(ngModel)]="userPassword" class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#AA9DD6]">
+        
+        <button (click)="onRegisterClick()" class="w-full bg-[#a390e4] hover:bg-[#8b78d1] text-white font-semibold rounded-xl py-3 mt-1 text-sm shadow-lg">Kayıt Ol</button>
+        
+        <!-- Giriş Yapma Linki -->
+        <p class="text-center text-[11px] text-gray-400 mt-4">
+          Zaten hesabınız var mı? 
+          <span (click)="loginStep = 1" class="text-[#a390e4] cursor-pointer underline hover:text-white transition-colors">Giriş Yap</span>
+        </p>
+
+        <p *ngIf="loginMessage" class="text-center text-xs font-semibold mt-4 text-red-400">{{ loginMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- AŞAMA 1: GİRİŞ EKRANI (Varsayılan Açılış Ekranı) -->
+  <!-- ============================================================== -->
+  <div *ngIf="loginStep === 1" class="flex flex-col md:flex-row w-full max-w-[1033px] h-[563px] bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative">
+    <!-- SOL TARAF (3D Logo) -->
+    <div class="hidden md:flex w-[310px] h-full relative items-center justify-center bg-no-repeat bg-cover bg-left" style="background-image: url('Subtract.png');">
+      <img src="Intersect.png" alt="3D Logo" class="w-[282px] object-contain drop-shadow-2xl z-10 relative top-[17px]">
+    </div>
+    <!-- SAĞ TARAF: Giriş Formu -->
     <div class="flex-1 flex flex-col justify-center px-12 md:px-24 lg:px-40 relative">
       <h2 class="text-2xl font-bold text-white mb-1.5 tracking-wide">Hoş Geldiniz</h2>
       <p class="text-[#9ca3af] text-xs mb-8">Devam etmek için lütfen mail adresinizi ve şifrenizi girin</p>
 
       <div class="space-y-4">
-        <input type="email" placeholder="ornekisim@mail.com.tr" [(ngModel)]="userEmail"
-               class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#AA9DD6] transition-colors">
+        <input type="email" placeholder="ornekisim@mail.com.tr" [(ngModel)]="userEmail" class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#AA9DD6]">
 
         <div class="relative">
-          <input type="password" placeholder="Şifre Gir" [(ngModel)]="userPassword"
-                 class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#AA9DD6] transition-colors">
+          <input type="password" placeholder="Şifre Gir" [(ngModel)]="userPassword" class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#AA9DD6]">
           <span class="absolute right-4 top-[14px] text-gray-500"><svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg></span>
         </div>
 
@@ -32,13 +57,17 @@
               <input type="checkbox" [(ngModel)]="isRobotChecked" class="w-4 h-4 accent-[#AA9DD6] rounded cursor-pointer border-gray-700 bg-transparent">
               <span class="text-gray-300 text-xs font-medium">Robot Olmadığınızı Kanıtlayın</span>
           </div>
-          <div class="flex flex-col items-center">
-            <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" class="w-6 opacity-80" alt="reCaptcha">
-            <span class="text-[8px] text-gray-500 mt-0.5">reCAPTCHA</span>
-          </div>
+          <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" class="w-6 opacity-80" alt="reCaptcha">
         </div>
 
         <button type="button" (click)="onLoginClick()" class="w-full bg-[#a390e4] hover:bg-[#8b78d1] text-white font-semibold rounded-xl py-3 mt-1 text-sm transition-colors shadow-lg">İleri</button>
+
+        <!-- Kaydolma Linki -->
+        <p class="text-center text-[11px] text-gray-400 mt-4">
+          Henüz hesabınız yok mu? 
+          <span (click)="loginStep = 0" class="text-[#a390e4] cursor-pointer underline hover:text-white transition-colors">Hemen Kaydol</span>
+        </p>
+        
         <p *ngIf="loginMessage" class="text-center text-xs font-semibold mt-4 text-red-400">{{ loginMessage }}</p>
       </div>
       
@@ -47,11 +76,9 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- AŞAMA 2: MFA KURULUM (Figma Sol Üst Ekran) -->
-  <!-- QR Kod tarama ve ilk doğrulama aşaması. -->
+  <!-- AŞAMA 2: MFA KURULUM (QR Kod) -->
   <!-- ============================================================== -->
   <div *ngIf="loginStep === 2" class="w-full max-w-[1033px] h-[563px] bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative p-12">
-    <!-- Üst Bar -->
     <div class="flex justify-between items-start mb-8">
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white font-bold text-xl italic shadow-inner">C</div>
@@ -59,20 +86,15 @@
       </div>
       <button class="border border-[#3f3f46] text-gray-300 text-[10px] px-4 py-2 rounded-lg hover:bg-white/5">Kurumsal Hesap</button>
     </div>
-
     <h3 class="text-2xl font-bold text-white mb-12">İki Faktörlü Doğrulama Kurulumu</h3>
-
     <div class="flex flex-col md:flex-row gap-20">
-      <!-- QR Bölümü -->
       <div class="flex-1 text-left">
         <p class="text-gray-400 text-sm mb-6">1. Aşağıdaki QR kodu uygulamanız ile tarayın.</p>
         <div class="bg-white p-4 rounded-2xl inline-block shadow-2xl"><img [src]="qrCodeImageUrl" alt="QR" class="w-36 h-32 object-contain"></div>
       </div>
-      <!-- Kod Giriş Bölümü -->
       <div class="flex-1 text-left">
         <p class="text-gray-400 text-sm mb-6">2. Uygulamanızdan 6 haneli kodu girin:</p>
-        <input type="text" maxlength="6" [(ngModel)]="mfaCode" placeholder="• • • • • •"
-               class="w-full bg-transparent border border-[#3f3f46] rounded-xl px-4 py-4 text-center text-3xl tracking-[0.7em] font-light focus:border-[#AA9DD6] transition-all mb-8 outline-none">
+        <input type="text" maxlength="6" [(ngModel)]="mfaCode" placeholder="• • • • • •" class="w-full bg-transparent border border-[#3f3f46] rounded-xl px-4 py-4 text-center text-3xl tracking-[0.7em] font-light focus:border-[#AA9DD6] transition-all mb-8 outline-none">
         <button (click)="onVerifyClick()" class="w-full bg-[#a390e4] hover:bg-[#8b78d1] text-white font-semibold rounded-xl py-3.5 text-sm shadow-lg">Doğrula ve Etkinleştir</button>
         <p *ngIf="loginMessage" class="text-center text-sm font-semibold mt-4 text-red-400">{{ loginMessage }}</p>
       </div>
@@ -80,38 +102,30 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- AŞAMA 3: KURTARMA KODLARI (Figma Sağ Üst Ekran) -->
-  <!-- MFA başarıyla kurulunca gösterilen yedek kodlar. -->
+  <!-- AŞAMA 3: KURTARMA KODLARI -->
   <!-- ============================================================== -->
   <div *ngIf="loginStep === 3" class="w-full max-w-[1033px] h-[563px] bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative p-12 text-center flex flex-col justify-center">
     <div class="absolute top-12 left-12 flex items-center gap-3">
         <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white font-bold italic">C</div>
-        <h1 class="text-white text-lg font-bold leading-tight">COMPANY ENERJİ A.Ş.</h1>
+        <h1 class="text-white text-lg font-bold">COMPANY ENERJİ A.Ş.</h1>
     </div>
     <h3 class="text-2xl font-bold text-white mb-3">Kurtarma Kodları Oluşturuldu</h3>
     <p class="text-gray-400 text-xs mb-10 max-w-md mx-auto">Bu kodlar, hesabınıza erişiminizi geri kazanmanız için kullanılabilir. Lütfen güvenli bir yerde saklayın.</p>
-    
     <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-12">
       <div *ngFor="let code of recoveryCodes" class="bg-[#1a181e] border border-[#3f3f46] rounded-xl py-4 text-[#a390e4] font-mono font-bold tracking-widest text-sm shadow-sm">{{code}}</div>
     </div>
-
     <div class="flex justify-center"><button (click)="loginStep = 6" class="bg-[#a390e4] hover:bg-[#8b78d1] text-white font-bold rounded-xl px-20 py-3.5 text-sm shadow-xl transition-all">✓ Kaydettim</button></div>
   </div>
 
   <!-- ============================================================== -->
-  <!-- AŞAMA 4: NORMAL MFA GİRİŞ (Figma Sol Alt Ekran) -->
-  <!-- Zaten MFA kurmuş kullanıcıların gördüğü karşılama ekranı. -->
+  <!-- AŞAMA 4: NORMAL MFA GİRİŞ (Merhaba Ahmet) -->
   <!-- ============================================================== -->
   <div *ngIf="loginStep === 4" class="w-full max-w-[1033px] h-[563px] bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative p-12 flex flex-col items-center justify-center">
-    <div class="absolute top-12 left-12 flex items-center gap-3">
-        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white font-bold italic">C</div>
-        <h1 class="text-white text-lg font-bold leading-tight">COMPANY ENERJİ A.Ş.</h1>
-    </div>
+    <div class="absolute top-12 left-12 flex items-center gap-3"><div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white font-bold italic">C</div><h1 class="text-white text-lg font-bold">COMPANY ENERJİ A.Ş.</h1></div>
     <div class="w-full max-w-sm text-center">
         <h3 class="text-3xl font-bold text-white mb-2">Merhaba, {{userName}}</h3>
         <p class="text-gray-400 text-xs mb-10 tracking-wide">Giriş yapmak için doğrulama kodunuzu girin</p>
-        <input type="text" maxlength="6" [(ngModel)]="mfaCode" placeholder="000 000"
-               class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-2xl p-5 text-white text-center text-3xl tracking-[0.5em] font-light mb-4 focus:border-[#AA9DD6] outline-none">
+        <input type="text" maxlength="6" [(ngModel)]="mfaCode" placeholder="000 000" class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-2xl p-5 text-white text-center text-3xl tracking-[0.5em] font-light mb-4 focus:border-[#AA9DD6] outline-none">
         <p class="text-[10px] text-gray-500 mb-10 italic">Kodun yenilenmesine: <span class="text-[#a390e4] font-bold">25sn</span></p>
         <button (click)="onVerifyClick()" class="w-full bg-[#a390e4] hover:bg-[#8b78d1] text-white font-bold rounded-2xl py-4 text-sm mb-4 transition-all shadow-lg">Doğrula ve Giriş Yap</button>
         <button class="w-full border border-[#3f3f46] text-gray-400 text-[11px] py-3.5 rounded-2xl mb-8 flex items-center justify-center gap-3 hover:bg-white/5 transition-all">📂 Yerel Şifre ile Giriş Yap (Acil Durum)</button>
@@ -120,19 +134,14 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- AŞAMA 5: KURTARMA KODUYLA GİRİŞ (Figma Sağ Alt Ekran) -->
-  <!-- Telefonu olmayan kullanıcılar için yedek giriş kapısı. -->
+  <!-- AŞAMA 5: KURTARMA KODUYLA GİRİŞ -->
   <!-- ============================================================== -->
   <div *ngIf="loginStep === 5" class="w-full max-w-[1033px] h-[563px] bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative p-12 flex flex-col items-center justify-center">
-    <div class="absolute top-12 left-12 flex items-center gap-3">
-        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white font-bold italic">C</div>
-        <h1 class="text-white text-lg font-bold leading-tight">COMPANY ENERJİ A.Ş.</h1>
-    </div>
+    <div class="absolute top-12 left-12 flex items-center gap-3"><div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white font-bold italic">C</div><h1 class="text-white text-lg font-bold">COMPANY ENERJİ A.Ş.</h1></div>
     <div class="w-full max-w-sm text-center">
         <h3 class="text-3xl font-bold text-white mb-2">Kurtarma Kodu ile Giriş</h3>
         <p class="text-gray-400 text-xs mb-10 tracking-wide">Lütfen yedek kurtarma kodlarınızdan birini girin</p>
-        <input type="text" [(ngModel)]="recoveryInputCode" placeholder="XXX-XXX"
-               class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-2xl p-5 text-white text-center text-2xl tracking-[0.2em] font-mono mb-10 focus:border-[#AA9DD6] outline-none">
+        <input type="text" [(ngModel)]="recoveryInputCode" placeholder="XXX-XXX" class="w-full bg-[#1a181e] border border-[#3f3f46] rounded-2xl p-5 text-white text-center text-2xl tracking-[0.2em] font-mono mb-10 focus:border-[#AA9DD6] outline-none">
         <button (click)="onRecoveryVerify()" class="w-full bg-[#a390e4] hover:bg-[#8b78d1] text-white font-bold rounded-2xl py-4 text-sm mb-4 shadow-lg transition-all">Doğrula ve Giriş Yap</button>
         <button (click)="loginStep = 4" class="w-full border border-[#3f3f46] text-gray-400 text-[11px] py-3.5 rounded-2xl hover:bg-white/5 transition-all">Vazgeç ve Geri Dön</button>
         <p *ngIf="loginMessage" class="text-center text-xs font-semibold mt-4 text-red-400">{{ loginMessage }}</p>
@@ -140,8 +149,7 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- AŞAMA 6: DASHBOARD (HOŞGELDİNİZ) -->
-  <!-- Tüm doğrulamalar bittiğinde ulaşılan final ekranı. -->
+  <!-- AŞAMA 6: DASHBOARD -->
   <!-- ============================================================== -->
   <div *ngIf="loginStep === 6" class="text-center animate-pulse">
     <h2 class="text-6xl font-black text-green-400 mb-4 tracking-tighter">SİSTEME GİRİLDİ</h2>

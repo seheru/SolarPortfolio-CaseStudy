@@ -131,4 +131,20 @@ export class AppComponent {
       }
     });
   }
+
+  // KAYIT OL BUTONU
+  onRegisterClick() {
+    const backendUrl = 'http://localhost:5032/api/Auth/register';
+    const kutu = { email: this.userEmail, password: this.userPassword };
+
+    this.http.post(backendUrl, kutu).subscribe({
+      next: (cevap: any) => {
+        alert("Kayıt Başarılı! Şimdi giriş yapabilirsiniz.");
+        this.loginStep = 1; // Başarılıysa Login ekranına gönder
+        this.loginMessage = '';
+      },
+      error: (hata) => this.loginMessage = "HATA: Kayıt olunamadı! " + hata.error
+    });
+  }
+
 }
