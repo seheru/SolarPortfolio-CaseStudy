@@ -72,23 +72,25 @@ export class AppComponent {
   // 2. AŞAMA: 6 HANELİ KODU DOĞRULA
   // ==========================================
   // 2. Aşamada çalışacak buton
-  onVerifyClick() {
-    
-    // İTİRAF ANI: Angular C#'a ne yollamaya çalışıyor? Ekrana zorla basalım!
-    alert("Angular'ın okuduğu Mail: '" + this.userEmail + "'\nAngular'ın okuduğu Kod: '" + this.mfaCode + "'");
+recoveryCodes: string[] = [];
 
+  onVerifyClick() {
     const backendUrl = 'http://localhost:5032/api/Auth/mfa-verify-setup';
+    
+    // En standart JSON formatı (Küçük harflerle)
     const kutu = {
       email: this.userEmail,
-      code: this.mfaCode
+      code: this.mfaCode.toString().trim()
     };
 
     this.http.post(backendUrl, kutu).subscribe({
       next: (cevap: any) => {
+        this.recoveryCodes = cevap.RecoveryCodes || cevap.recoveryCodes; // Kodları hafızaya al
         this.loginStep = 3; 
+        this.loginMessage = '';
       },
       error: (hata) => {
-        this.loginMessage = "HATA: Girdiğiniz kod yanlış veya süresi dolmuş!";
+        this.loginMessage = "HATA: " + (hata.error || "Kod yanlış!");
       }
     });
   }
