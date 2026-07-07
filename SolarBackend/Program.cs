@@ -3,17 +3,27 @@ using SolarBackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Veritabanı bağlantımızı sisteme tanıtıyoruz
+// BİRİNCİ EKLEME (Kapıyı Angular'a açıyoruz)
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
+// Veritabanı bağlantımızı sisteme tanıtıyoruz
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. GARSONLARI (CONTROLLERS) SİSTEME TANIT (İşte unuttuğumuz satır buydu!)
-builder.Services.AddControllers();
-
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// İKİNCİ EKLEME (Güvenlik görevlisine talimat veriyoruz)
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
@@ -22,8 +32,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// 3. GELEN İSTEKLERİ GARSONLARA YÖNLENDİR (Ve bu satır)
 app.MapControllers();
-
 app.Run();
