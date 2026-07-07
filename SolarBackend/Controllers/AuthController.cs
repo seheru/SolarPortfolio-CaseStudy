@@ -22,22 +22,22 @@ public class AuthController : ControllerBase
     // -------------------------------------------------------------
     // 1. KAYIT OL (Test Hesabı Oluşturmak İçin)
     // -------------------------------------------------------------
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(string email, string password)
+[HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] LoginRequest request) // Body'den alacak
     {
-        if (await _context.Users.AnyAsync(u => u.Email == email))
+        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             return BadRequest("Bu e-posta zaten kayıtlı!");
 
         var user = new User
         {
-            Email = email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+            Email = request.Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok("Kullanıcı başarıyla oluşturuldu!");
+        return Ok(new { Message = "Kullanıcı başarıyla oluşturuldu!" });
     }
 
     // -------------------------------------------------------------
