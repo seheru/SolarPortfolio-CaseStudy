@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { HttpClient } from '@angular/common/http'; 
+import { ThemeService } from './services/theme'; 
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,10 @@ export class AppComponent {
   recoveryCodes: string[] = []; // C#'tan gelen 5 adet yedek kod
   userName = 'Ahmet'; // Figma'daki "Merhaba, Ahmet" yazısı için
 
-  constructor(private http: HttpClient) {} 
+  constructor(
+  private http: HttpClient, 
+  public themeService: ThemeService
+) { }
 
   // -------------------------------------------------------------------------
   // 1. ADIM: İLERİ BUTONU (E-POSTA VE ŞİFRE KONTROLÜ)
