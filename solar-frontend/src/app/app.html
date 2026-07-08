@@ -85,6 +85,13 @@
             style="font-family: 'Poppins', sans-serif;">
             İleri
           </button>
+
+          <!-- EKLENEN HATA MESAJI KISMI -->
+          <p *ngIf="loginMessage" class="text-center text-[14px] font-medium mt-4 text-red-400 tracking-wide animate-pulse">
+            {{ loginMessage }}
+          </p>
+          <!-- ========================== -->
+
         </div>
       </div>
       
