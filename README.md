@@ -13,7 +13,7 @@ This project is a highly secure, multi-step authentication module developed as a
 ### Login & Registration
 | Dark Mode (TR) | Light Mode (EN) |
 | :---: | :---: |
-| ![Login Dark](screenshots/giriş-tr-dark.png) | ![Login Light](screenshots/enter-en-white.png) |
+| ![Login Dark](screenshots/giris-tr-dark.png) | ![Login Light](screenshots/enter-en-white.png) |
 
 ### Multi-Factor Authentication (MFA)
 | QR Code Setup (TR) | MFA Verification (EN) |
