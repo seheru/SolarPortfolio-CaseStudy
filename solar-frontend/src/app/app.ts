@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { HttpClient } from '@angular/common/http'; 
 import { ThemeService } from './services/theme'; 
+import { LanguageService } from './services/language';
+
+
 
 @Component({
   selector: 'app-root',
@@ -12,143 +15,194 @@ import { ThemeService } from './services/theme';
 })
 export class AppComponent {
   // -------------------------------------------------------------------------
-  // DEĞİŞKENLER (HAFIZA)
+  // DEĞİŞKENLER
   // -------------------------------------------------------------------------
+  isVerifying = false; // İşlem sürerken çift tıklamayı engelleyecek kilit
+  
   userEmail = '';
   userPassword = '';
   isRobotChecked = false;
   
-  // loginStep Takibi (Figma ekranları arasındaki geçiş):
-  // 1: Login Ekranı
-  // 2: MFA Kurulum Ekranı (QR Kod)
-  // 3: Kurtarma Kodlarını Görüntüleme Ekranı (MFA Kurulumu sonrası)
-  // 4: Normal MFA Doğrulama Ekranı (Zaten kurulu olanlar için)
-  // 5: Kurtarma Kodu ile Giriş Ekranı (Authenticator'a erişemeyenler için)
-  // 6: Dashboard (Hoşgeldiniz)
-  loginStep: number = 1; 
+  // loginStep Takibi:
+  // 0: Kayıt, 1: Login, 2: MFA Setup, 3: Recovery Codes, 4: MFA Verify, 5: Recovery Verify, 6: Dashboard
+  // Eski "loginStep: number = 1;" yerine bu bloğu ekliyoruz:
+  private _loginStep: number = 1;
 
-  mfaCode = ''; // Telefon daki 6 haneli kod
-  recoveryInputCode = ''; // Kullanıcının girdiği yedek kurtarma kodu
-  loginMessage = ''; // Hata veya bilgi mesajları
-  qrCodeImageUrl = ''; // C#'tan gelen QR resim yolu
-  recoveryCodes: string[] = []; // C#'tan gelen 5 adet yedek kod
-  userName = 'Ahmet'; // Figma'daki "Merhaba, Ahmet" yazısı için
+  get loginStep(): number {
+    return this._loginStep;
+  }
+
+  set loginStep(value: number) {
+    if (value === 6) {
+      console.error("DİKKAT! SİSTEM 6. AŞAMAYA (DASHBOARD) GEÇİRİLDİ!");
+      console.trace("Bunu tetikleyen fonksiyon şurada:"); 
+    }
+    this._loginStep = value;
+  }
+
+  mfaCode = ''; 
+  recoveryInputCode = ''; 
+  loginMessage = ''; 
+  qrCodeImageUrl = ''; 
+  recoveryCodes: string[] = []; 
+  userName = 'Ahmet'; 
 
   constructor(
-  private http: HttpClient, 
-  public themeService: ThemeService
-) { }
+    private http: HttpClient, 
+    public themeService: ThemeService,
+    public langService: LanguageService 
+  ) { }
 
   // -------------------------------------------------------------------------
-  // 1. ADIM: İLERİ BUTONU (E-POSTA VE ŞİFRE KONTROLÜ)
+  // 1. ADIM: GİRİŞ BUTONU (E-POSTA VE ŞİFRE KONTROLÜ)
   // -------------------------------------------------------------------------
   onLoginClick() {
-    if (this.isRobotChecked === false) {
-      this.loginMessage = "HATA: Lütfen robot olmadığınızı kanıtlayın!";
+    if (!this.isRobotChecked) {
+      this.loginMessage = this.langService.translate('error_robot');
       return;
     }
 
     const backendUrl = 'http://localhost:5032/api/Auth/login';
-    const loginKutu = {
-      email: this.userEmail,
-      password: this.userPassword
-    };
+    const loginData = { email: this.userEmail, password: this.userPassword };
 
-    this.http.post(backendUrl, loginKutu).subscribe({
+    this.http.post(backendUrl, loginData).subscribe({
       next: (cevap: any) => {
-        // C# "Şifre doğru" dedi. Şimdi MFA durumuna göre ekran seçeceğiz:
-        
-        // DURUM A: Eğer kullanıcının ilk girişi ise ve MFA kurması gerekiyorsa (RequiresMfaSetup)
+        // MFA Kurulumu gerekiyor mu kontrolü
         if (cevap.requiresMfaSetup || cevap.RequiresMfaSetup) { 
           const qrUrl = `http://localhost:5032/api/Auth/mfa-setup?email=${this.userEmail}`;
           
           this.http.post(qrUrl, {}).subscribe({
             next: (qrCevap: any) => {
               this.qrCodeImageUrl = qrCevap.QrCodeImage || qrCevap.qrCodeImage; 
-              this.loginStep = 2; // QR Kodu gösterme ekranına git (Figma Sol Üst)
+              this.loginStep = 2; 
               this.loginMessage = ''; 
             }
           });
-        }
-        // DURUM B: Eğer kullanıcının zaten MFA'sı kuruluysa
-        else {
-          this.loginStep = 4; // Normal 6 haneli kod sorma ekranına git (Figma Sol Alt)
+        } else {
+          this.loginStep = 4; 
           this.loginMessage = ''; 
         }
       },
-      error: (hata) => {
-        this.loginMessage = "HATA: E-posta veya şifre hatalı!";
+      error: () => {
+        this.loginMessage = this.langService.translate('error_auth');
       }
     });
   }
 
   // -------------------------------------------------------------------------
-  // 2. ADIM: DOĞRULA BUTONU (6 HANELİ KODU ONAYLAMA)
+  // 2. ADIM: MFA DOĞRULAMA (İLK KURULUM VEYA NORMAL GİRİŞ)
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // 2. ADIM: MFA DOĞRULAMA (İLK KURULUM)
   // -------------------------------------------------------------------------
   onVerifyClick() {
-    const backendUrl = 'http://localhost:5032/api/Auth/mfa-verify-setup';
+    // Eğer halihazırda bir istek atıldıysa ve cevap bekleniyorsa, durdur (Çift tıklama engeli)
+    if (this.isVerifying) return; 
     
-    const verifyKutu = {
+    this.isVerifying = true; // Kilidi kapat
+
+    const backendUrl = 'http://localhost:5032/api/Auth/mfa-verify-setup';
+    const verifyData = {
       email: this.userEmail,
-      code: this.mfaCode.replace(/\s/g, '') // Aradaki boşlukları silerek yolluyoruz
+      code: this.mfaCode.replace(/\s/g, '') 
     };
 
-    this.http.post(backendUrl, verifyKutu).subscribe({
+    this.http.post(backendUrl, verifyData).subscribe({
       next: (cevap: any) => {
-        // C# Kodu onayladı! 
+        this.isVerifying = false; // Kilidi aç
         
-        // Eğer bu ilk kurulumsa (recoveryCodes gelmişse), kodları gösterelim:
+        // GÜVENLİK AĞI: Eğer arka planda gecikmeli bir istek geldiyse ve biz 
+        // çoktan 3. aşamaya geçtiysek, bu gecikmeli isteği tamamen yok say!
+        if (this.loginStep !== 2) return;
+
         if (cevap.RecoveryCodes || cevap.recoveryCodes) {
           this.recoveryCodes = cevap.RecoveryCodes || cevap.recoveryCodes;
-          this.loginStep = 3; // Kurtarma kodları ekranına git (Figma Sağ Üst)
+          this.loginStep = 3; 
         } else {
-          // Eğer normal giriş yapıyorsa doğrudan Dashboard'a:
           this.loginStep = 6; 
         }
         this.loginMessage = '';
       },
-      error: (hata) => {
-        this.loginMessage = "HATA: Girdiğiniz kod yanlış veya süresi dolmuş!";
+      error: () => {
+        this.isVerifying = false; // Kilidi aç
+        this.loginMessage = this.langService.translate('error_mfa');
       }
     });
   }
 
   // -------------------------------------------------------------------------
-  // 3. ADIM: KURTARMA KODUYLA GİRİŞ (Authenticator'a erişilemiyorsa)
+  // 4. ADIM: NORMAL MFA İLE GİRİŞ (KURULUMDAN SONRAKİ STANDART GİRİŞ)
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // 4. ADIM: NORMAL MFA İLE GİRİŞ
+  // -------------------------------------------------------------------------
+  onNormalMfaVerify() {
+    if (this.isVerifying) return; // Çift tıklamayı engelle
+    this.isVerifying = true;      // Kilidi kapat
+
+    const backendUrl = 'http://localhost:5032/api/Auth/mfa-verify-setup'; 
+    const verifyData = {
+      email: this.userEmail,
+      code: this.mfaCode.replace(/\s/g, '') 
+    };
+
+    this.http.post(backendUrl, verifyData).subscribe({
+      next: () => {
+        this.isVerifying = false; // İşlem bitti kilidi aç
+        this.loginStep = 6; 
+        this.loginMessage = '';
+      },
+      error: () => {
+        this.isVerifying = false; // Hata oldu kilidi aç
+        this.loginMessage = this.langService.translate('error_mfa');
+      }
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // 3. ADIM: KURTARMA KODUYLA GİRİŞ
   // -------------------------------------------------------------------------
   onRecoveryVerify() {
     const backendUrl = 'http://localhost:5032/api/Auth/verify-recovery-code';
-    
-    const recoveryKutu = {
+    const recoveryData = {
       email: this.userEmail,
       code: this.recoveryInputCode.trim()
     };
 
-    this.http.post(backendUrl, recoveryKutu).subscribe({
-      next: (cevap: any) => {
-        // Yedek kod doğru! Sisteme alıyoruz.
-        this.loginStep = 6; // Dashboard ekranı
+    this.http.post(backendUrl, recoveryData).subscribe({
+      next: () => {
+        this.loginStep = 6; 
         this.loginMessage = '';
       },
-      error: (hata) => {
-        this.loginMessage = "HATA: Geçersiz veya kullanılmış kurtarma kodu!";
+      error: () => {
+        this.loginMessage = this.langService.translate('error_recovery');
       }
     });
   }
 
-  // KAYIT OL BUTONU
+  // -------------------------------------------------------------------------
+  // 4. ADIM: KAYIT OLMA
+  // -------------------------------------------------------------------------
   onRegisterClick() {
     const backendUrl = 'http://localhost:5032/api/Auth/register';
-    const kutu = { email: this.userEmail, password: this.userPassword };
+    const registerData = { email: this.userEmail, password: this.userPassword };
 
-    this.http.post(backendUrl, kutu).subscribe({
-      next: (cevap: any) => {
-        alert("Kayıt Başarılı! Şimdi giriş yapabilirsiniz.");
-        this.loginStep = 1; // Başarılıysa Login ekranına gönder
+    this.http.post(backendUrl, registerData).subscribe({
+      next: () => {
+        alert(this.langService.translate('register_success'));
+        this.loginStep = 1; 
         this.loginMessage = '';
       },
-      error: (hata) => this.loginMessage = "HATA: Kayıt olunamadı! " + hata.error
+      error: () => {
+        this.loginMessage = this.langService.translate('error_reg');
+      }
     });
   }
-
+  // -------------------------------------------------------------------------
+  // 3. AŞAMADAN 6. AŞAMAYA GEÇİŞ (KAYDETTİM BUTONU)
+  // -------------------------------------------------------------------------
+  onSavedClick() {
+    console.log("Kaydettim butonuna basıldı, Sisteme giriliyor...");
+    this.loginStep = 6;
+  }
 }

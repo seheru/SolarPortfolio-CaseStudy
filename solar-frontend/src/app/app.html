@@ -1,36 +1,45 @@
 <!-- Ana Kapsayıcı: Beyaz modda bg-gray-100, Koyu modda senin orijinal rengin bg-[#110f17] -->
 <div class="transition-colors duration-500 min-h-screen flex items-center justify-center p-4 bg-gray-100 dark:bg-[#110f17] font-sans text-gray-900 dark:text-white">
 
-  <!-- TEMA DEĞİŞTİRME BUTONU (Sadece bunu ekledim, içeriği etkilemez) -->
-  <button (click)="themeService.toggleTheme()" class="fixed top-6 right-6 z-[100] p-3 rounded-full shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-all hover:scale-110">
-    <span *ngIf="!themeService.isDarkMode()" class="text-xl">🌙</span>
-    <span *ngIf="themeService.isDarkMode()" class="text-xl">☀️</span>
-  </button>
+  <!-- ============================================================== -->
+  <!-- ÜST PANEL: DİL VE TEMA BUTONLARI -->
+  <!-- ============================================================== -->
+  <div class="fixed top-6 right-6 z-[100] flex gap-3">
+    <!-- Dil Değiştirme Butonu -->
+    <button type="button" (click)="langService.toggleLang(); $event.preventDefault(); $event.stopPropagation();" class="px-4 py-2 rounded-full shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 font-bold text-sm transition-all hover:scale-110 active:scale-95">
+      <span class="text-blue-600 dark:text-blue-400">
+        {{ langService.getLang() === 'tr' ? 'EN' : 'TR' }}
+      </span>
+    </button>
+
+    <!-- Tema Değiştirme Butonu -->
+    <button type="button" (click)="themeService.toggleTheme(); $event.preventDefault(); $event.stopPropagation();" class="p-3 rounded-full shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-all hover:scale-110">
+      <span *ngIf="!themeService.isDarkMode()" class="text-xl">🌙</span>
+      <span *ngIf="themeService.isDarkMode()" class="text-xl">☀️</span>
+    </button>
+  </div>
 
   <!-- ============================================================== -->
   <!-- AŞAMA 0: KAYIT OLMA EKRANI -->
   <!-- ============================================================== -->
   <div *ngIf="loginStep === 0" class="flex flex-col md:flex-row w-full max-w-[1033px] h-[563px] bg-white dark:bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative border border-gray-100 dark:border-none">
-    <!-- SOL TARAF (3D Logo) -->
     <div class="hidden md:flex w-[310px] h-full relative items-center justify-center bg-no-repeat bg-cover bg-left" style="background-image: url('Subtract.png');">
       <img src="Intersect.png" alt="3D Logo" class="w-[282px] object-contain drop-shadow-2xl z-10 relative top-[17px]">
     </div>
-    <!-- SAĞ TARAF: Kayıt Formu -->
     <div class="flex-1 flex flex-col justify-center px-12 md:px-24 lg:px-40 relative">
-      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-1.5 tracking-wide">Hesap Oluştur</h2>
-      <p class="text-gray-500 dark:text-[#9ca3af] text-xs mb-8">Solar Portfolio dünyasına katılmak için kayıt olun</p>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-1.5 tracking-wide">{{ langService.translate('create_account') }}</h2>
+      <p class="text-gray-500 dark:text-[#9ca3af] text-xs mb-8">{{ langService.translate('join_solar') }}</p>
 
       <div class="space-y-4">
-        <input type="email" placeholder="E-posta adresiniz" [(ngModel)]="userEmail" class="w-full bg-gray-50 dark:bg-[#1a181e] border border-gray-300 dark:border-[#3f3f46] rounded-xl px-4 py-3 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#AA9DD6]">
-        <input type="password" placeholder="Güçlü bir şifre belirleyin" [(ngModel)]="userPassword" class="w-full bg-gray-50 dark:bg-[#1a181e] border border-gray-300 dark:border-[#3f3f46] rounded-xl px-4 py-3 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#AA9DD6]">
+        <input type="email" [placeholder]="langService.translate('email_placeholder')" [(ngModel)]="userEmail" class="w-full bg-gray-50 dark:bg-[#1a181e] border border-gray-300 dark:border-[#3f3f46] rounded-xl px-4 py-3 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#AA9DD6]">
+        <input type="password" [placeholder]="langService.translate('password_placeholder')" [(ngModel)]="userPassword" class="w-full bg-gray-50 dark:bg-[#1a181e] border border-gray-300 dark:border-[#3f3f46] rounded-xl px-4 py-3 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#AA9DD6]">
         
-        <button (click)="onRegisterClick()" class="w-full bg-[#a390e4] hover:bg-[#8b78d1] text-white font-semibold rounded-xl py-3 mt-1 text-sm shadow-lg">Kayıt Ol</button>
+        <button type="button" (click)="onRegisterClick()" class="w-full bg-[#a390e4] hover:bg-[#8b78d1] text-white font-semibold rounded-xl py-3 mt-1 text-sm shadow-lg">{{ langService.translate('register') }}</button>
         
         <p class="text-center text-[11px] text-gray-500 dark:text-gray-400 mt-4">
-          Zaten hesabınız var mı? 
-          <span (click)="loginStep = 1" class="text-[#a390e4] cursor-pointer underline hover:text-gray-900 dark:hover:text-white transition-colors">Giriş Yap</span>
+          {{ langService.translate('has_account') }} 
+          <span (click)="loginStep = 1" class="text-[#a390e4] cursor-pointer underline hover:text-gray-900 dark:hover:text-white transition-colors">{{ langService.translate('login_link') }}</span>
         </p>
-
         <p *ngIf="loginMessage" class="text-center text-xs font-semibold mt-4 text-red-500 dark:text-red-400">{{ loginMessage }}</p>
       </div>
     </div>
@@ -40,7 +49,6 @@
   <!-- AŞAMA 1: GİRİŞ EKRANI -->
   <!-- ============================================================== -->
   <div *ngIf="loginStep === 1" class="flex flex-col md:flex-row w-full max-w-[1033px] h-[563px] bg-white dark:bg-[#201D24] rounded-3xl overflow-hidden shadow-2xl relative border border-gray-100 dark:border-none">
-    
     <div class="hidden md:flex w-[310px] h-full relative items-center justify-center bg-no-repeat bg-cover bg-left" style="background-image: url('Subtract.png');">
       <img src="Intersect.png" alt="3D Logo" class="w-[282px] object-contain drop-shadow-2xl z-10 relative top-[17px]">
     </div>
@@ -49,18 +57,16 @@
       <div (click)="loginStep = 0" class="absolute top-0 right-0 w-[50px] h-[50px] z-50"></div>
 
       <div class="w-full max-w-[400px]">
-        <h2 class="text-[26px] font-bold text-gray-900 dark:text-white mb-0.5 tracking-wide leading-none">Hoş Geldiniz</h2>
-        <p class="text-gray-600 dark:text-gray-300 text-[14px] mb-8 font-light">Devam etmek için lütfen mail adresinizi ve şifrenizi girin</p>
+        <h2 class="text-[26px] font-bold text-gray-900 dark:text-white mb-0.5 tracking-wide leading-none">{{ langService.translate('welcome') }}</h2>
+        <p class="text-gray-600 dark:text-gray-300 text-[14px] mb-8 font-light">{{ langService.translate('login_desc') }}</p>
         <div class="flex flex-col w-full">
-          
           <div class="flex flex-col gap-2.5">
             <input type="email" placeholder="örnekisim@mail.com.tr" [(ngModel)]="userEmail" 
                    class="w-full h-[48px] bg-gray-50 dark:bg-[#232029] border border-gray-300 dark:border-[#3E3A47] rounded-[10px] px-4 text-[18px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#8879B5] transition-colors">
-
             <div class="relative">
-              <input type="password" placeholder="Şifre Gir" [(ngModel)]="userPassword" 
-                     class="w-full h-[48px] bg-gray-50 dark:bg-[#232029] border border-gray-300 dark:border-[#3E3A47] rounded-[10px] px-4 pr-12 text-[18px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#8879B5] transition-colors">
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#E4E4E7] cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors">
+              <input type="password" [placeholder]="langService.translate('pass_placeholder')" [(ngModel)]="userPassword" 
+                     class="w-full h-[48px] bg-gray-50 dark:bg-[#232029] border border-gray-300 dark:border-[#3E3A47] rounded-[10px] px-4 pr-12 text-[18px] text-gray-900 dark:text-white focus:outline-none focus:border-[#8879B5]">
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#E4E4E7] cursor-pointer hover:text-white transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                   <line x1="1" y1="1" x2="23" y2="23"></line>
@@ -72,8 +78,8 @@
           <div class="mt-12 flex items-center justify-between bg-gray-50 dark:bg-[#232029] border border-gray-300 dark:border-[#3E3A47] rounded-[10px] pl-4 pr-3 h-[56px]">
             <div class="flex items-center gap-3">
                 <input type="checkbox" [(ngModel)]="isRobotChecked" 
-                       class="w-[18px] h-[18px] appearance-none border-[1.5px] border-gray-400 dark:border-[#E4E4E7] rounded-[3px] bg-transparent cursor-pointer checked:bg-[#8879B5] checked:border-[#8879B5] relative flex justify-center items-center after:content-[''] after:hidden checked:after:block after:w-[5px] after:h-[10px] after:border-r-2 after:border-b-2 after:border-white after:rotate-45 after:-translate-y-[1px]">
-                <span class="text-gray-700 dark:text-[#E4E4E7] text-[17px] font-normal tracking-wide">Robot Olmadığınızı Kanıtlayın</span>
+                       class="w-[18px] h-[18px] appearance-none border-[1.5px] border-gray-400 dark:border-[#E4E4E7] rounded-[3px] bg-transparent cursor-pointer checked:bg-[#8879B5]">
+                <span class="text-gray-700 dark:text-[#E4E4E7] text-[17px] font-normal tracking-wide">{{ langService.translate('robot_check') }}</span>
             </div>
             <div class="flex flex-col items-center justify-center mt-0.5">
               <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" class="w-[24px] opacity-90 mb-[1px]" alt="reCaptcha">
@@ -81,33 +87,30 @@
             </div>
           </div>
 
-          <button type="button" (click)="onLoginClick()" class="w-full h-[50px] bg-[#8778b8] hover:bg-[#7868a5] text-white font-bold text-[21px] tracking-tight rounded-[10px] mt-4 transition-colors shadow-lg">İleri</button>
+          <button type="button" (click)="onLoginClick()" class="w-full h-[50px] bg-[#8778b8] hover:bg-[#7868a5] text-white font-bold text-[21px] rounded-[10px] mt-4 transition-colors shadow-lg">{{ langService.translate('login_btn') }}</button>
           <p *ngIf="loginMessage" class="text-center text-[14px] font-medium mt-4 text-red-500 dark:text-red-400 tracking-wide animate-pulse">{{ loginMessage }}</p>
         </div>
       </div>
-      
-      <div class="absolute bottom-5 w-full left-0 flex justify-center text-[9px] font-light text-gray-500 dark:text-white tracking-wide opacity-80">
-        Justech Yazılım ve Teknoloji Danışmanlık A.Ş. © Copyright 2026
-      </div>
+      <div class="absolute bottom-5 w-full left-0 flex justify-center text-[9px] font-light text-gray-500 dark:text-white tracking-wide opacity-80">{{ langService.translate('copyright') }}</div>
     </div>
   </div>
 
   <!-- AŞAMA 2: MFA KURULUM -->
   <div *ngIf="loginStep === 2" class="w-full max-w-[1040px] h-[660px] bg-white dark:bg-[#1B1B1F] rounded-[20px] overflow-hidden relative p-12 md:p-[60px] flex flex-col font-sans border border-gray-200 dark:border-white/5 shadow-2xl mx-auto">
     <div class="flex justify-between items-start mb-[40px] w-full">
-      <img src="companylogo+name.png" alt="Company Enerji A.Ş." class="h-[75px] w-auto object-contain dark:invert-0" [class.invert]="!themeService.isDarkMode()">
-      <button class="hover:opacity-80 mt-2"><img src="mor.png" alt="Kurumsal Hesap" class="h-[30px] w-auto"></button>
+      <img src="companylogo+name.png" alt="Logo" class="h-[75px] w-auto object-contain dark:invert-0" [class.invert]="!themeService.isDarkMode()">
+      <button type="button" class="hover:opacity-80 mt-2"><img src="mor.png" class="h-[30px] w-auto"></button>
     </div>
-    <div class="relative -top-5 text-left mb-[40px] w-full"><h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">İki Faktörlü Doğrulama Kurulumu</h3></div>
+    <div class="relative -top-5 text-left mb-[40px] w-full"><h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">{{ langService.translate('mfa_setup_title') }}</h3></div>
     <div class="relative -top-8 flex-1 flex flex-col md:flex-row gap-10 md:gap-16 w-full max-w-[750px] mx-auto items-center justify-center">
       <div class="flex flex-col items-center md:items-start text-left w-full md:w-[300px]">
-        <p class="text-gray-800 dark:text-white text-[18px] mb-7 font-light">1. Aşağıdaki QR kodu uygulamanız ile tarayın.</p>
-        <div class="inline-block shadow-xl bg-white p-3 rounded-xl border border-gray-100"><img [src]="qrCodeImageUrl" class="w-32 h-32"></div>
+        <p class="text-gray-800 dark:text-white text-[18px] mb-7 font-light">{{ langService.translate('mfa_step1') }}</p>
+        <div class="inline-block shadow-xl bg-white p-3 rounded-xl border border-gray-100"><img [src]="qrCodeImageUrl" class="w-32 h-32 object-contain"></div>
       </div>
       <div class="flex flex-col items-center md:items-start text-left w-full md:w-[330px]">
-        <p class="text-gray-800 dark:text-white text-[18px] mb-10 font-light">2. Uygulamanızdan 6 haneli kodu girin:</p>
+        <p class="text-gray-800 dark:text-white text-[18px] mb-10 font-light">{{ langService.translate('mfa_step2') }}</p>
         <input type="text" maxlength="6" [(ngModel)]="mfaCode" class="w-full h-[58px] bg-gray-50 dark:bg-[#222026] border border-gray-300 dark:border-[#3e3948] rounded-lg px-4 text-center text-3xl text-gray-900 dark:text-white mb-12 outline-none focus:border-[#9b84ec]">
-        <button (click)="onVerifyClick()" class="w-full h-[58px] bg-[#9b84ec] hover:bg-[#8870db] text-white text-[18px] font-medium rounded-lg shadow-lg">Doğrula ve Etkinleştir</button>
+        <button type="button" (click)="onVerifyClick()" class="w-full h-[58px] bg-[#9b84ec] hover:bg-[#8870db] text-white text-[18px] font-medium rounded-lg shadow-lg">{{ langService.translate('verify_activate') }}</button>
         <p *ngIf="loginMessage" class="text-center text-sm font-semibold mt-4 text-red-500 dark:text-red-400 w-full">{{ loginMessage }}</p>
       </div>
     </div>
@@ -116,59 +119,106 @@
   <!-- AŞAMA 3: KURTARMA KODLARI -->
   <div *ngIf="loginStep === 3" class="w-full max-w-[1040px] h-[660px] bg-white dark:bg-[#1B1B1F] rounded-[20px] overflow-hidden relative p-12 md:p-[60px] flex flex-col font-sans border border-gray-200 dark:border-white/5 shadow-2xl mx-auto">
     <div class="flex justify-between items-start mb-[40px] w-full">
-      <img src="companylogo+name.png" alt="Company Enerji A.Ş." class="h-[75px] w-auto dark:invert-0" [class.invert]="!themeService.isDarkMode()">
-      <button class="mt-2"><img src="mor.png" class="h-[30px] w-auto"></button>
+      <img src="companylogo+name.png" alt="Logo" class="h-[75px] w-auto dark:invert-0" [class.invert]="!themeService.isDarkMode()">
+      <button type="button" class="mt-2"><img src="mor.png" class="h-[30px] w-auto"></button>
     </div>
-    <div class="relative -top-5 text-left mb-[40px] w-full"><h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">Kurtarma Kodları Oluşturuldu</h3><p class="text-gray-600 dark:text-[#a4a0af] text-[16px]">Bu kodlar, hesabınıza erişiminizi geri kazanmanız için kullanılabilir.</p></div>
+    <div class="relative -top-5 text-left mb-[40px] w-full">
+      <h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">{{ langService.translate('recovery_title') }}</h3>
+      <p class="text-gray-600 dark:text-[#a4a0af] text-[16px]">{{ langService.translate('recovery_desc') }}</p>
+    </div>
     <div class="flex-1 flex flex-col items-center justify-center w-full">
       <div class="mb-8 w-full max-w-[400px] rounded-xl bg-gray-100 dark:bg-[#2C2A33] px-8 py-8 shadow-inner grid grid-cols-3 gap-x-4 gap-y-6 text-center">
         <div *ngFor="let code of recoveryCodes" class="text-[18px] font-bold text-gray-900 dark:text-white">{{code}}</div>
       </div>
-      <button (click)="loginStep = 6" class="flex h-[58px] w-full max-w-[400px] items-center justify-center rounded-lg bg-[#9b84ec] text-[18px] font-medium text-white shadow-lg hover:bg-[#8870db]">Kaydettim</button>
+      <button type="button" (click)="onSavedClick()" class="flex h-[58px] w-full max-w-[400px] items-center justify-center rounded-lg bg-[#9b84ec] text-[18px] font-medium text-white shadow-lg hover:bg-[#8870db]">
+      {{ langService.translate('saved_btn') }}
+      </button>   
     </div>
   </div>
 
   <!-- AŞAMA 4: NORMAL MFA GİRİŞ -->
   <div *ngIf="loginStep === 4" class="w-full max-w-[1040px] h-[660px] bg-white dark:bg-[#1B1B1F] rounded-[20px] overflow-hidden relative p-12 md:p-[60px] flex flex-col font-sans border border-gray-200 dark:border-white/5 shadow-2xl mx-auto">
+    
+    <!-- Üst Logo ve Sağ Buton -->
     <div class="flex justify-between items-start mb-[40px] w-full">
       <img src="companylogo+name.png" class="h-[75px] w-auto dark:invert-0" [class.invert]="!themeService.isDarkMode()">
-      <button class="mt-2"><img src="mor.png" class="h-[30px] w-auto"></button>
-    </div>
-    <div class="relative -top-5 text-left mb-[40px] w-full"><h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">Merhaba, Ahmet</h3><p class="text-gray-600 dark:text-[#a4a0af] text-[18px]">Giriş yapmak için doğrulama kodunuzu girin</p></div>
-    <div class="flex-1 flex flex-col items-center justify-center w-full max-w-[460px] mx-auto text-center">
-      <input type="text" maxlength="6" [(ngModel)]="mfaCode" placeholder="000 000" class="w-full h-[58px] bg-gray-50 dark:bg-[#222026] border border-gray-300 dark:border-[#3e3948] rounded-lg px-6 text-gray-900 dark:text-white text-[16px] mb-3 focus:border-[#9b84ec] outline-none">
-      <p class="text-[15px] text-gray-500 dark:text-[#a4a0af] mb-[30px] w-full text-center">Kodun yenilenmesine: <span class="text-gray-900 dark:text-white font-bold">25sn</span></p>
-      <button (click)="onVerifyClick()" class="w-full h-[58px] bg-[#9b84ec] hover:bg-[#8870db] text-white text-[18px] font-medium rounded-lg shadow-lg mb-4">Doğrula ve Giriş Yap</button>
-      <button class="w-full h-[58px] bg-transparent border border-gray-300 dark:border-[#3e3948] text-gray-600 dark:text-[#c0bccd] text-[17px] rounded-lg mb-8 flex items-center justify-center gap-3">
-        <img src="Vector.png" class="w-5 h-5"> Yerel Şifre ile Giriş Yap (Acil Durum)
+      <button type="button" class="mt-2 flex items-center justify-center px-4 py-2 bg-transparent border border-gray-300 dark:border-[#3e3948] text-gray-700 dark:text-[#c0bccd] rounded-lg text-sm hover:bg-white/5 transition-colors">
+        <img src="mor.png" class="h-4 w-auto mr-2" *ngIf="false"> <!-- İkonunuz varsa buraya ekleyin -->
+        Kurumsal Hesap
       </button>
-      <a (click)="loginStep = 5" class="text-[18px] text-gray-600 dark:text-[#c0bccd] underline cursor-pointer hover:text-gray-900 dark:hover:text-white">Authenticator'a Erişemiyorum</a>
     </div>
-    <div class="absolute bottom-2 w-full left-0 flex justify-center text-[12px] text-gray-500 dark:text-white/60 font-light">Justech Yazılım ve Teknoloji Danışmanlık A.Ş. © Copyright 2025</div>
+
+    <!-- Başlık Kısmı (Virgül eklendi, fontlar tasarıma uyarlandı) -->
+    <div class="relative -top-5 text-left mb-[40px] w-full">
+      <h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">
+        {{ langService.translate('hello') }}, {{ userName }}
+      </h3>
+      <p class="text-gray-600 dark:text-[#a4a0af] text-[18px]">
+        {{ langService.translate('enter_code') }}
+      </p>
+    </div>
+
+    <!-- Form Alanı -->
+    <div class="flex-1 flex flex-col items-center justify-center w-full max-w-[460px] mx-auto text-center">
+      
+      <!-- Şifre Input -->
+      <input type="text" maxlength="6" [(ngModel)]="mfaCode" placeholder="000 000" class="w-full h-[58px] bg-gray-50 dark:bg-[#222026] border border-gray-300 dark:border-[#3e3948] rounded-lg px-6 text-gray-900 dark:text-white text-[16px] mb-3 outline-none focus:border-[#9b84ec] tracking-[0.2em] placeholder:tracking-normal">
+      
+      <!-- Sayaç (mb-30px yerine mb-6 yapıldı) -->
+      <p class="text-[15px] text-gray-500 dark:text-[#a4a0af] mb-6 w-full text-center">
+        {{ langService.translate('timer_text') }} <span class="text-gray-900 dark:text-white font-bold">25sn</span>
+      </p>
+
+      <!-- 1. BUTON -->
+      <button type="button" (click)="onNormalMfaVerify()" class="w-full h-[58px] bg-[#9b84ec] hover:bg-[#8870db] text-white text-[18px] font-medium rounded-lg shadow-lg mb-3 transition-colors">
+        {{ langService.translate('verify_login') }}
+      </button>
+
+      <!-- HATA MESAJI -->
+      <p *ngIf="loginMessage" class="text-center text-[14px] font-semibold mb-3 text-red-500 dark:text-red-400 tracking-wide">{{ loginMessage }}</p>
+
+      <!-- 2. BUTON -->
+      <button type="button" class="w-full h-[58px] bg-transparent hover:bg-white/5 border border-gray-300 dark:border-[#4d4857] text-gray-700 dark:text-[#c0bccd] text-[16px] rounded-lg mb-6 flex items-center justify-center gap-3 transition-colors">
+        <img src="Vector.png" class="w-5 h-5 opacity-70 dark:invert-0"> 
+        {{ langService.translate('emergency_pass') }}
+      </button>
+
+      <!-- Alt Link -->
+      <a (click)="loginStep = 5" class="text-[17px] text-gray-600 dark:text-[#a4a0af] underline decoration-gray-500 underline-offset-4 cursor-pointer hover:text-white transition-all z-10 relative">
+        {{ langService.translate('no_access') }}
+      </a>
+    </div>
+
+    <!-- Footer Copyright -->
+    <div class="absolute bottom-6 w-full left-0 flex justify-center text-[12px] text-gray-500 dark:text-[#84818e] font-light tracking-wide">
+      {{ langService.translate('copyright_2025') }}
+    </div>
   </div>
 
   <!-- AŞAMA 5: KURTARMA KODUYLA GİRİŞ -->
   <div *ngIf="loginStep === 5" class="w-full max-w-[1040px] h-[660px] bg-white dark:bg-[#1B1B1F] rounded-[20px] overflow-hidden relative p-12 md:p-[60px] flex flex-col font-sans border border-gray-200 dark:border-white/5 shadow-2xl mx-auto">
     <div class="flex justify-between items-start mb-[40px] w-full">
       <img src="companylogo+name.png" class="h-[75px] w-auto dark:invert-0" [class.invert]="!themeService.isDarkMode()">
-      <button class="mt-2"><img src="mor.png" class="h-[30px] w-auto"></button>
+      <button type="button" class="mt-2"><img src="mor.png" class="h-[30px] w-auto"></button>
     </div>
-    <div class="relative -top-5 text-left mb-[40px] w-full"><h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">Kurtarma Kodu ile Giriş</h3><p class="text-gray-600 dark:text-[#a4a0af] text-[18px]">Lütfen yedek kurtarma kodlarınızdan birini girin</p></div>
+    <div class="relative -top-5 text-left mb-[40px] w-full">
+      <h3 class="text-[32px] font-bold text-gray-900 dark:text-white tracking-tight mb-2">{{ langService.translate('recovery_login_title') }}</h3>
+      <p class="text-gray-600 dark:text-[#a4a0af] text-[18px]">{{ langService.translate('recovery_login_desc') }}</p>
+    </div>
     <div class="flex-1 flex flex-col items-center justify-center w-full max-w-[420px] mx-auto text-center">
-      <input type="text" [(ngModel)]="recoveryInputCode" placeholder="XXX-XXX" class="w-full h-[58px] bg-gray-50 dark:bg-[#222026] border border-gray-300 dark:border-[#3e3948] rounded-lg px-6 text-gray-900 dark:text-white text-[20px] mb-16 focus:border-[#9b84ec] outline-none">
-      <button (click)="onRecoveryVerify()" class="w-full h-[58px] bg-[#9b84ec] hover:bg-[#8870db] text-white text-[18px] font-medium rounded-lg mb-4 shadow-lg">Doğrula ve Giriş Yap</button>
-      <button class="w-full h-[58px] bg-transparent border border-gray-300 dark:border-[#3e3948] text-gray-600 dark:text-[#c0bccd] text-[17px] rounded-lg flex items-center justify-center gap-3">
-        <img src="Vector.png" class="w-5 h-5"> Yerel Şifre ile Giriş Yap (Acil Durum)
+      <input type="text" [(ngModel)]="recoveryInputCode" placeholder="XXX-XXX" class="w-full h-[58px] bg-gray-50 dark:bg-[#222026] border border-gray-300 dark:border-[#3e3948] rounded-lg px-6 text-gray-900 dark:text-white text-[20px] mb-16 outline-none focus:border-[#9b84ec]">
+      <button type="button" (click)="onRecoveryVerify()" class="w-full h-[58px] bg-[#9b84ec] hover:bg-[#8870db] text-white text-[18px] font-medium rounded-lg mb-4 shadow-lg">{{ langService.translate('verify_login') }}</button>
+      <button type="button" class="w-full h-[58px] bg-transparent border border-gray-300 dark:border-[#3e3948] text-gray-600 dark:text-[#c0bccd] text-[17px] rounded-lg flex items-center justify-center gap-3">
+        <img src="Vector.png" class="w-5 h-5"> {{ langService.translate('emergency_pass') }}
       </button>
-      <p *ngIf="loginMessage" class="text-red-500 dark:text-red-400 text-[12px] mt-4 font-bold">{{loginMessage}}</p>
     </div>
-    <div class="absolute bottom-2 w-full left-0 flex justify-center text-[12px] text-gray-500 dark:text-white/60 font-light">Justech Yazılım ve Teknoloji Danışmanlık A.Ş. © Copyright 2025</div>
+    <div class="absolute bottom-2 w-full left-0 flex justify-center text-[12px] text-gray-500 dark:text-white/60 font-light">{{ langService.translate('copyright_2025') }}</div>
   </div>
 
   <!-- AŞAMA 6: DASHBOARD -->
   <div *ngIf="loginStep === 6" class="text-center animate-pulse">
-    <h2 class="text-6xl font-black text-green-500 dark:text-green-400 mb-4 tracking-tighter">SİSTEME GİRİLDİ</h2>
-    <p class="text-gray-600 dark:text-gray-400 text-xl font-light italic">Justech Solar Portfolio Paneline Yönlendiriliyorsunuz...</p>
+    <h2 class="text-6xl font-black text-green-500 dark:text-green-400 mb-4 tracking-tighter">{{ langService.translate('success_title') }}</h2>
+    <p class="text-gray-600 dark:text-gray-400 text-xl font-light italic">{{ langService.translate('redirect_text') }}</p>
     <div class="mt-10 flex justify-center"><div class="w-12 h-12 border-4 border-[#a390e4] border-t-transparent rounded-full animate-spin"></div></div>
   </div>
 
