@@ -12,10 +12,10 @@ export class LanguageService {
       // Step 0 & 1: Login/Register
       create_account: 'Hesap Oluştur',
       join_solar: 'Solar Portfolio dünyasına katılmak için kayıt olun',
-      email_placeholder: 'E-posta adresiniz',
+      email_placeholder: 'ornekisim@mail.com.tr',
       password_placeholder: 'Güçlü bir şifre belirleyin',
       register: 'Kayıt Ol',
-      has_account: 'Zaten hesabınız var mı?',
+      has_account: 'Zaten hesabınız var mı',
       login_link: 'Giriş Yap',
       welcome: 'Hoş Geldiniz',
       login_desc: 'Devam etmek için lütfen mail adresinizi ve şifrenizi girin',
@@ -24,7 +24,7 @@ export class LanguageService {
       login_btn: 'İleri',
       copyright: 'Justech Yazılım ve Teknoloji Danışmanlık A.Ş. © Copyright 2026',
       copyright_2025: 'Justech Yazılım ve Teknoloji Danışmanlık A.Ş. © Copyright 2025',
-
+      
       // Step 2: MFA Setup
       mfa_setup_title: 'İki Faktörlü Doğrulama Kurulumu',
       mfa_step1: '1. Aşağıdaki QR kodu uygulamanız ile tarayın.',
@@ -62,7 +62,7 @@ export class LanguageService {
       // Step 0 & 1: Login/Register
       create_account: 'Create Account',
       join_solar: 'Join the Solar Portfolio world by registering',
-      email_placeholder: 'Your email address',
+      email_placeholder: 'example@mail.com',
       password_placeholder: 'Set a strong password',
       register: 'Register',
       has_account: 'Already have an account?',

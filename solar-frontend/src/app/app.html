@@ -61,7 +61,7 @@
         <p class="text-gray-600 dark:text-gray-300 text-[14px] mb-8 font-light">{{ langService.translate('login_desc') }}</p>
         <div class="flex flex-col w-full">
           <div class="flex flex-col gap-2.5">
-            <input type="email" placeholder="örnekisim@mail.com.tr" [(ngModel)]="userEmail" 
+            <input type="email" [placeholder]="langService.translate('email_placeholder')" [(ngModel)]="userEmail"
                    class="w-full h-[48px] bg-gray-50 dark:bg-[#232029] border border-gray-300 dark:border-[#3E3A47] rounded-[10px] px-4 text-[18px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#8879B5] transition-colors">
             <div class="relative">
               <input type="password" [placeholder]="langService.translate('pass_placeholder')" [(ngModel)]="userPassword" 
