@@ -21,12 +21,12 @@ This project is a highly secure, multi-step authentication module developed as a
 | ![QR Setup](screenshots/qr-tr-dark.png) | ![MFA Verify](screenshots/mfa-en-white.png) |
 
 ### Recovery Codes & Emergency Access
-| Recovery Codes Generated (TR) | Login with Recovery Code (EN) |
+| Recovery Codes Generated (TR) | Recovery Codes Generated (EN) |
 | :---: | :---: |
 | ![Recovery Codes](screenshots/kurtarma-tr-dark.png) | ![Recovery Login](screenshots/save-en-white.png) |
 
 ### System Access & Mobile View
-| Dashboard Success (TR) | Responsive Mobile View |
+| Kurtarma Kodu ile Giriş (TR) | Responsive Mobile View |
 | :---: | :---: |
 | ![Success](screenshots/son-tr-dark.png) | ![Mobile View](screenshots/mobil.png) |
 
